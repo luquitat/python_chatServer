@@ -29,7 +29,7 @@ if __name__ == "__main__":
 	# Add server socket to the list of readable connections
 	connected_list.append(server_socket)
 
-	print "\33[32m \t\t\t\tSERVER WORKING \33[0m" 
+	print "\33[32m \t\t\t\tSERVIDOR CORRIENDO \33[0m" 
 
 	while 1:
         # Get the list sockets which are ready to be read through select
@@ -47,7 +47,7 @@ if __name__ == "__main__":
                 
                 #if repeated username
 				if name in record.values():
-					sockfd.send("\r\33[31m\33[1m Username already taken!\n\33[0m")
+					sockfd.send("\r\33[31m\33[1m El nombre de usuario ya esta siendo utilizado!\n\33[0m")
 					del record[addr]
 					connected_list.remove(sockfd)
 					sockfd.close()
@@ -56,8 +56,8 @@ if __name__ == "__main__":
                     #add name and address
 					record[addr]=name
 					print "Client (%s, %s) connected" % addr," [",record[addr],"]"
-					sockfd.send("\33[32m\r\33[1m Welcome to chat room. Enter 'tata' anytime to exit\n\33[0m")
-					send_to_all(sockfd, "\33[32m\33[1m\r "+name+" joined the conversation \n\33[0m")
+					sockfd.send("\33[32m\r\33[1m Bienvenido al chat. Ingrese 'romagnoli' para salir\n\33[0m")
+					send_to_all(sockfd, "\33[32m\33[1m\r "+name+" se ha unido al chat \n\33[0m")
 
 			#Some incoming message from a client
 			else:
@@ -70,24 +70,26 @@ if __name__ == "__main__":
                     
                     #get addr of client sending the message
 					i,p=sock.getpeername()
-					if data == "tata":
-						msg="\r\33[1m"+"\33[31m "+record[(i,p)]+" left the conversation \33[0m\n"
+					if data == "romagnoli":
+						msg="\r\33[1m"+"\33[31m "+record[(i,p)]+" ha salido del chat \33[0m\n"
 						send_to_all(sock,msg)
-						print "Client (%s, %s) is offline" % (i,p)," [",record[(i,p)],"]"
+						print "El cliente (%s, %s) no esta conectado" % (i,p)," [",record[(i,p)],"]"
 						del record[(i,p)]
 						connected_list.remove(sock)
 						sock.close()
 						continue
 
 					else:
+						if data.startswith('#') :
+							print "arrrrancccaaaaa"
 						msg="\r\33[1m"+"\33[35m "+record[(i,p)]+": "+"\33[0m"+data+"\n"
 						send_to_all(sock,msg)
             
                 #abrupt user exit
 				except:
 					(i,p)=sock.getpeername()
-					send_to_all(sock, "\r\33[31m \33[1m"+record[(i,p)]+" left the conversation unexpectedly\33[0m\n")
-					print "Client (%s, %s) is offline (error)" % (i,p)," [",record[(i,p)],"]\n"
+					send_to_all(sock, "\r\33[31m \33[1m"+record[(i,p)]+" se ha ido del chat\33[0m\n")
+					print "El cliente (%s, %s) no esta disponible(error)" % (i,p)," [",record[(i,p)],"]\n"
 					del record[(i,p)]
 					connected_list.remove(sock)
 					sock.close()
