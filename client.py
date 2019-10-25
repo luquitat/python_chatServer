@@ -1,5 +1,5 @@
 import socket, select, string, sys
-
+##
 #Helper function (formatting)
 def display() :
 	you="\33[33m\33[1m"+" Tu: "+"\33[0m"
