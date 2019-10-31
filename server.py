@@ -11,7 +11,7 @@ def send_to_all (sock, message):
 				# if connection not available
 				socket.close()
 				connected_list.remove(socket)
-
+def help
 if __name__ == "__main__":
 	name=""
 	#dictionary to store address corresponding to username
@@ -80,8 +80,6 @@ if __name__ == "__main__":
 						continue
 
 					else:
-						if data.startswith('#') :
-							print "arrrrancccaaaaa"
 						msg="\r\33[1m"+"\33[35m "+record[(i,p)]+": "+"\33[0m"+data+"\n"
 						send_to_all(sock,msg)
             
