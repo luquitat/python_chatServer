@@ -11,7 +11,7 @@ def atender(sock, msg, data):
 	if data.startswith("/"):
 		opcion = lista[0][1:]
 		if opcion not in opciones:
-			sockfd.send("\n El comando no existe o es incorrecto. Use /help para ver los comandos disponibles")
+			sock.send("\r El comando no existe o es incorrecto. Use /help para ver los comandos disponibles\n")
 		else:
 			if opcion == opciones[0]: ###### LOGOUT ######
 				logout(sock)
@@ -40,7 +40,7 @@ def atender(sock, msg, data):
 				else:
 					todos(sock, msg)
 			else:
-				print "probando error"
+				todos(sock, msg)
 	else:
 		todos(sock, msg)
 
@@ -81,33 +81,29 @@ def todos (sock, message):
 # se envia un mensaje privado a un usuario seleccionado. Recorremos la lista de conectados
 # y buscamos el usuario y le mandamos el mensaje solo a el
 def privado(sock,message,user):
-	llave = [key for key, nombre in record.items() if nombre == user]
-	lla = llave[0]
+	flag = -1
 	for socket in connected_list:
 		if socket != server_socket:
-			if socket.getpeername() == lla:
+			if record[socket.getpeername()] == user:
 				try :
-					if (sock.getpeername() == lla):
-						socket.send("\n\33[0m\33[44m\33[33m"+ message+"\33[0m\n")
-					else:	
-						socket.send("\r\33[1m"+"\33[35m "+record[(i,p)]+": "+"\33[0m\33[44m\33[33m"+ message+"\33[0m\n")
+					flag = 1
+					socket.send("\r\33[1m"+"\33[35m "+record[(i,p)]+": "+"\33[0m\33[44m\33[33m"+ message+"\33[0m\n")
 				except :
 					# Si la conexion no esta disponible
 					socket.close()
 					connected_list.remove(socket)
-
+	if( flag == -1):
+		sock.send("\r\33[1m"+"\33[31m El usuario "+user+" no existe \33[0m\n")
+	
 # se elimina un usuario seleccionado. Recorremos la lista de conectados
 # y buscamos el que se quiere eliminar
 def kick(sock,message,user):
-	llave = [key for key, nombre in record.items() if nombre == user]
-	lla = llave[0]
 	for socket in connected_list:
 		if socket != server_socket and socket != sock:
-			if socket.getpeername() == lla:
+			if record[socket.getpeername()]  == user:
 				try :
-					msg="\r\33[1m"+"\33[31m "+record[lla]+" ha sido eliminado por "+record[sock.getpeername()]+" \33[0m\n"
-					del record[lla]
-					todos(sock,msg)
+					msg="\r\33[1m"+"\33[31m "+user+" ha sido eliminado por "+record[sock.getpeername()]+" \33[0m\n"
+					del record[socket.getpeername()]
 					connected_list.remove(socket)
 					socket.close()
 					continue
@@ -116,7 +112,7 @@ def kick(sock,message,user):
 					# Si la conexion no esta disponible
 					socket.close()
 					connected_list.remove(socket)
-
+	todos(sock,msg)
 # el usuario obtiene una lista de todos los usuarios conectados
 def usuarios(sock):
 	try :
@@ -129,9 +125,9 @@ def usuarios(sock):
 				if i < len(record.items()):
 					lista_usuarios += ", "
 		if(lista_usuarios == ""):
-			msg = "Estas solito ;)"
+			msg = "\r Estas solito ;)"
 		else:
-			msg = " Usuarios: " + lista_usuarios
+			msg = "\r Usuarios: " + lista_usuarios
 		privado(sock, msg, record[sock.getpeername()])
 	except :
 		# Si la conexion no esta disponible
@@ -149,10 +145,11 @@ def nick(sock, newNick):
 				oldNick = nombre
 				record[sock.getpeername()] = newNick
 		if(oldNick != ""):
-			msg = "\n El usuario " + oldNick + " cambio su nick a " + newNick + "\n"
+			msg = "\r El usuario " + oldNick + " cambio su nick a " + newNick + "\n"
 			todos(sock, msg)
-			privado(sock, "Cambiaste tu nick a " + newNick, newNick)
-		
+			privado(sock, "\r Cambiaste tu nick a " + newNick, newNick)
+		else :
+			privado(sock, "\r El nick ya existe", record[sock.getpeername()])
 	except :
 		# Si la conexion no esta disponible
 		socket.close()
